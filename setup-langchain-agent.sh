@@ -80,18 +80,59 @@ EOL
     echo "📄 Created .env file with placeholder API keys."
 }
 
+# Function: Show help
+show_help() {
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "LangChain Agent Setup Tool — Installs dependencies for LangChain agent development."
+    echo ""
+    echo "Options:"
+    echo "  -h, --help        Show this help message and exit"
+    echo "  -p, --provider    Run in non-interactive mode with specified provider"
+    echo ""
+    echo "Supported Providers:"
+    echo "  OpenAI | Google Gemini | Anthropic Claude | Meta (Llama) | Mistral AI | All"
+    echo ""
+    echo "Examples:"
+    echo "  $0 --provider \"OpenAI\""
+    echo "  $0 -p \"Google Gemini\""
+    echo "  $0 --help"
+    exit 0
+}
+
 # === Main Script Logic ===
 
-echo "Welcome to the LangChain Agent Setup Tool"
-echo "Select your main LLM provider:"
-select PROVIDER in "${LLM_PROVIDERS[@]}"; do
-    if [ 1 -le "$REPLY" ] && [ "$REPLY" -le ${#LLM_PROVIDERS[@]} ]; then
-        SELECTED_PROVIDER=${LLM_PROVIDERS[$((REPLY-1))]}
-        break
-    else
-        echo "Invalid selection. Please try again."
-    fi
+# Parse command-line arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            ;;
+        -p|--provider)
+            SELECTED_PROVIDER="$2"
+            shift
+            ;;
+        *)
+            echo "Unknown parameter: $1"
+            show_help
+            ;;
+    esac
+    shift
 done
+
+# If no provider was provided via CLI args, prompt interactively
+if [ -z "${SELECTED_PROVIDER+x}" ]; then
+    echo "Welcome to the LangChain Agent Setup Tool"
+    echo "Select your main LLM provider:"
+    select PROVIDER in "${LLM_PROVIDERS[@]}"; do
+        if [ 1 -le "$REPLY" ] && [ "$REPLY" -le ${#LLM_PROVIDERS[@]} ]; then
+            SELECTED_PROVIDER=${LLM_PROVIDERS[$((REPLY-1))]}
+            break
+        else
+            echo "Invalid selection. Please try again."
+        fi
+    done
+fi
 
 echo "You selected: $SELECTED_PROVIDER"
 
