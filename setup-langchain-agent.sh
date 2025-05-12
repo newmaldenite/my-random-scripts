@@ -136,11 +136,27 @@ fi
 
 echo "You selected: $SELECTED_PROVIDER"
 
-install_dependencies "$SELECTED_PROVIDER"
-generate_env_file "$SELECTED_PROVIDER"
+# Create a virtual environment
+echo "Creating a virtual environment..."
+python3 -m venv .venv
 
-echo ""
-echo "🎉 Setup complete!"
-echo "Next steps:"
-echo "1. Review and fill out the .env file with your actual API keys."
-echo "2. Start building your agent in Python using LangChain."
+# Check if the virtual environment was created successfully
+if [ -d ".venv" ]; then
+    echo "Virtual environment created successfully."
+
+    # Activate the virtual environment
+    echo "Activating the virtual environment..."
+    source .venv/bin/activate
+
+    install_dependencies "$SELECTED_PROVIDER"
+    generate_env_file "$SELECTED_PROVIDER"
+
+    echo ""
+    echo "🎉 Setup complete!"
+    echo "Next steps:"
+    echo "1. Review and fill out the .env file with your actual API keys."
+    echo "2. Start building your agent in Python using LangChain."
+else
+    echo "Failed to create the virtual environment."
+    exit 1
+fi
